@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Service Layer of Samyati - a travel blogging site",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Space-Xplorer/Samyati.git"
+  },
+  "author": "Maheshwar Patnala",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Space-Xplorer/Samyati/issues"
+  },
+  "homepage": "https://github.com/Space-Xplorer/Samyati#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.11.0"
+  }
+}
