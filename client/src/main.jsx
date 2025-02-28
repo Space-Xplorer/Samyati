@@ -1,10 +1,12 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ClerkProvider } from '@clerk/clerk-react';
+import App from './App';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <ClerkProvider publishableKey={clerkPubKey}>
     <App />
-  </StrictMode>,
-)
+  </ClerkProvider>
+);

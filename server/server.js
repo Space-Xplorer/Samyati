@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); //Load .env file
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
