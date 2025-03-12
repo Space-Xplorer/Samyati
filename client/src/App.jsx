@@ -1,98 +1,90 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { ClerkProvider, SignedIn, SignedOut, UserButton, useAuth, SignIn, SignUp } from '@clerk/clerk-react';
+// App.jsx
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { SignedIn, SignedOut, UserButton, useAuth } from '@clerk/clerk-react';
+import { Container, Navbar, Nav, Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// Pages
+import Home from './pages/Home';
+import Blogs from './pages/Blogs';
+import CreateBlog from './pages/CreateBlog';
+import Auth from './pages/Auth';
 
-const Home = () => {
+const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
-    <div>
-      <h1>Welcome to Samyati</h1>
-      <p>Your ultimate travel blogging companion.</p>
-      <div className="nav-links">
-        <Link to="/blogs">Explore Blogs</Link>
-        <Link to="/create-blog">Create Blog</Link>
+    <div className="hero-section">
+      <div className="hero-content text-center">
+        <h1 className="hero-title">Discover Travel Stories</h1>
+        <div className="hero-buttons mt-4">
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="me-3"
+            onClick={() => navigate('/blogs')}
+          >
+            Explore Blogs
+          </Button>
+          <SignedIn>
+            <Button 
+              variant="success" 
+              size="lg"
+              onClick={() => navigate('/create-blog')}
+            >
+              Write a Blog
+            </Button>
+          </SignedIn>
+          <SignedOut>
+            <Button 
+              variant="success" 
+              size="lg"
+              onClick={() => navigate('/auth')}
+            >
+              Sign In to Write
+            </Button>
+          </SignedOut>
+        </div>
       </div>
     </div>
   );
 };
 
-const Blogs = () => {
+const Navigation = () => {
   return (
-    <div>
-      <h1>Travel Blogs</h1>
-      <p>Explore stories from fellow travelers.</p>
-    </div>
+    <Navbar bg="dark" variant="dark" expand="lg" className="fixed-top">
+      <Container>
+        <Navbar.Brand as={Link} to="/">Samyati</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link as={Link} to="/blogs">All Blogs</Nav.Link>
+          </Nav>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <Button as={Link} to="/auth" variant="outline-light">
+              Sign In
+            </Button>
+          </SignedOut>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-const CreateBlog = () => {
+export default function App() {
   return (
-    <div>
-      <h1>Create a New Blog</h1>
-      <p>Share your travel experiences with the world.</p>
-    </div>
-  );
-};
-
-const Auth = () => {
-  return (
-    <div>
-      <h2>Sign In</h2>
-      <SignIn />
-      <h2>Sign Up</h2>
-      <SignUp />
-    </div>
-  );
-};
-
-const ProtectedRoute = ({ children }) => {
-  const { isSignedIn } = useAuth();
-
-  if (!isSignedIn) {
-    return <Navigate to="/auth" />;
-  }
-
-  return children;
-};
-
-const Navbar = () => {
-  return (
-    <nav>
-      <Link to="/">Home</Link>
-      <Link to="/blogs">Blogs</Link>
-      <Link to="/create-blog">Create Blog</Link>
-      <SignedIn>
-        <UserButton afterSignOutUrl="/" />
-      </SignedIn>
-      <SignedOut>
-        <Link to="/auth">Login</Link>
-      </SignedOut>
-    </nav>
-  );
-};
-
-function App() {
-  return (
-    <ClerkProvider publishableKey={clerkPubKey}>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route
-            path="/create-blog"
-            element={
-              <ProtectedRoute>
-                <CreateBlog />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/auth" element={<Auth />} />
-        </Routes>
-      </Router>
-    </ClerkProvider>
+    <Router>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/create-blog" element={<CreateBlog />} />
+        <Route path="/auth" element={<Auth />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
