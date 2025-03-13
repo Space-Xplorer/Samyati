@@ -28,4 +28,4 @@ const blogRoutes = require('./routes/blogRoutes');
 
 // Use Routes
 app.use('/api/users', userRoutes);
-app.use('/api/blogs', blogRoutes);
+// app.use('/api/blogs', blogRoutes);

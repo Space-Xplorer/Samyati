@@ -1,42 +1,65 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+/* App.css */
+:root {
+  --primary-dark: #2A4B7A;    /* Deep teal from mountain shadows */
+  --accent-green: #4A7C59;    /* Muted green from vegetation */
+  --warm-terracotta: #DAA588; /* Warm tone from earth colors */
+  --clean-white: #F8F9FA;
+}
+
+.hero-section {
+  background-image: 
+    linear-gradient(rgba(42, 75, 122, 0.7), rgba(42, 75, 122, 0.7)),
+    url('https://www.hoteldekho.com/blog/wp-content/uploads/2022/04/Beautiful-Scenic-places-in-India.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content {
+  max-width: 800px;
   padding: 2rem;
-  text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.hero-title {
+  color: var(--clean-white);
+  font-size: 3.5rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.5rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-primary {
+  background-color: var(--accent-green);
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.btn-success {
+  background-color: var(--warm-terracotta);
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
 }
 
-.card {
-  padding: 2em;
+.btn-primary:hover {
+  background-color: #3A6548;
+  transform: translateY(-2px);
 }
 
-.read-the-docs {
-  color: #888;
+.btn-success:hover {
+  background-color: #C28F6F;
+  transform: translateY(-2px);
+}
+
+.navbar-dark {
+  background-color: var(--primary-dark) !important;
+  padding: 1rem 0;
 }
