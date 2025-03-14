@@ -1,15 +1,14 @@
-// App.jsx
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { SignedIn, SignedOut, UserButton, useAuth } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-// Pages
 import Home from './pages/Home';
 import Blogs from './pages/Blogs';
 import CreateBlog from './pages/CreateBlog';
-import Auth from './pages/Auth';
+import Auth1 from './components/auth1';
+import Auth2 from './components/auth2';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -40,7 +39,7 @@ const HomePage = () => {
             <Button 
               variant="success" 
               size="lg"
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/auth1')}
             >
               Sign In to Write
             </Button>
@@ -65,8 +64,11 @@ const Navigation = () => {
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
           <SignedOut>
-            <Button as={Link} to="/auth" variant="outline-light">
+            <Button as={Link} to="/auth1" variant="outline-light">
               Sign In
+            </Button>
+            <Button as={Link} to="/auth2" variant="outline-light">
+              Sign Up
             </Button>
           </SignedOut>
         </Navbar.Collapse>
@@ -83,7 +85,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/create-blog" element={<CreateBlog />} />
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth1" element={<Auth1 />} />
+        <Route path="/auth2" element={<Auth2 />} />
       </Routes>
     </Router>
   );

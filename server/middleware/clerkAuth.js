@@ -1,17 +1,20 @@
 const { verifyToken } = require('@clerk/backend');
 
 const clerkAuth = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
+  const token = authHeader.split(' ')[1];
+
   try {
     const decoded = await verifyToken(token);
-    req.user = decoded; // Attach user data to request
+    req.auth = { userId: decoded.sub }; // Clerk's user ID
     next();
   } catch (err) {
+    console.error('Token verification failed:', err);
     res.status(401).json({ message: 'Invalid token' });
   }
 };

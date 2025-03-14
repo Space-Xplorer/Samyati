@@ -63,3 +63,20 @@
   background-color: var(--primary-dark) !important;
   padding: 1rem 0;
 }
+
+.blog-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.card-body {
+  background: var(--clean-white);
+}

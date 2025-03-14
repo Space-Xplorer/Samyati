@@ -6,9 +6,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173', // Your client origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
+
+app.options('*', cors());
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL)
@@ -23,9 +31,9 @@ app.get('/', (req, res) => {
 });
 
 // Import routes
-const userRoutes = require('./routes/UserRoutes');
+// const userRoutes = require('./routes/UserRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 
 // Use Routes
-app.use('/api/users', userRoutes);
-// app.use('/api/blogs', blogRoutes);
+// app.use('/api/users', userRoutes);
+app.use('/api/blogs', blogRoutes);
