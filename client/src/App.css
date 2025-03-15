@@ -62,7 +62,6 @@
 .navbar-dark {
   background-color: var(--primary-dark) !important;
   padding: 1rem 0;
-<<<<<<< HEAD
 }
 
 .blog-card {
@@ -80,6 +79,4 @@
 
 .card-body {
   background: var(--clean-white);
-=======
->>>>>>> 561ca75a3962599d74cb4296db87567101a3d8f0
 }
