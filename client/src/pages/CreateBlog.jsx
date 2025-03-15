@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Spinner, Container, Alert } from "react-bootstrap";
+import { useAuth } from '@clerk/clerk-react';
 
 export default function CreateBlog() {
+  const { getToken } = useAuth();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
@@ -16,26 +18,26 @@ export default function CreateBlog() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-  
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    if (image) formData.append("image", image);
-  
-    const token = localStorage.getItem("token");
-  
+    
     try {
+      const token = await getToken(); // This gets the Clerk session token
+      console.log("Clerk Token:", token);
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      if (image) formData.append("image", image);
+
       const response = await fetch("http://localhost:5000/api/blogs", {
         method: "POST",
         body: formData,
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
       });
   
       const data = await response.json();
+      console.log("Server Response:", data);
       
       if (!response.ok) {
         throw new Error(data.error || "Failed to post blog");

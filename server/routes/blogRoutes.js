@@ -35,25 +35,34 @@ const authenticate = async (req, res, next) => {
 // Create blog post with authentication
 router.post("/", clerkAuth, upload.single("image"), async (req, res) => {
   try {
-    const { title, content } = req.body;
+    console.log("Authenticated user ID:", req.auth.userId);
     
     const newBlog = new Blog({
-      title,
-      content,
-      author: req.auth.userId, // Add author reference
+      title: req.body.title,
+      content: req.body.content,
+      author: req.auth.userId, // Use Clerk user ID
       image: req.file ? {
         data: req.file.buffer,
         contentType: req.file.mimetype
       } : null
     });
 
-    await newBlog.save();
-    res.status(201).json(newBlog);
+    const savedBlog = await newBlog.save();
+    console.log("Saved blog:", savedBlog);
+    
+    res.status(201).json({
+      message: "Blog created successfully",
+      blog: {
+        _id: savedBlog._id,
+        title: savedBlog.title,
+        author: savedBlog.author
+      }
+    });
   } catch (error) {
     console.error("Blog creation error:", error);
-    res.status(400).json({ 
+    res.status(400).json({
       error: error.message,
-      details: error.errors 
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

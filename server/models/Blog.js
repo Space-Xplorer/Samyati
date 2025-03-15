@@ -8,12 +8,12 @@ mongoose.connect("mongodb://localhost:27017/Samyati", {
 const BlogSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  author: { type: String, required: true },
-  image: { data: Buffer, contentType: String }, 
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  author: { type: String, required: true }, // Clerk user ID
+  image: { data: Buffer, contentType: String },
+  likes: [{ type: String }], // Store Clerk user IDs
   comments: [{
     text: String,
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    author: { type: String }, // Clerk user ID
     createdAt: { type: Date, default: Date.now }
   }]
 }, { timestamps: true });
