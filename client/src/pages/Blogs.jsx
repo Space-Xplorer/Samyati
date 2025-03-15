@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import { Card, Container, Row, Col, Spinner } from 'react-bootstrap';
 
@@ -47,3 +48,8 @@ export default function Blogs() {
     </Container>
   );
 }
+=======
+export default function Blogs() {
+    return <div className="container py-5">Blog List Page</div>;
+  }
+>>>>>>> 561ca75a3962599d74cb4296db87567101a3d8f0
