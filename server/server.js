@@ -1,39 +1,67 @@
-require('dotenv').config(); //Load .env file
+require("dotenv").config()
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const app = express();
-app.use(cors({
-  origin: 'http://localhost:5173', // Your client origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+const express = require("express")
+const mongoose = require("mongoose")
+const cors = require("cors")
+const path = require("path")
 
+// Initialize Express app
+const app = express()
+const PORT = process.env.PORT || 5000
 
-app.options('*', cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware
+// Fix CORS to allow requests from both development ports
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+)
+
+// For preflight requests
+app.options("*", cors())
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URL)
+mongoose
+  .connect(process.env.MONGO_URL)
   .then(() => {
-    app.listen(PORT, () => console.log(`Server running on ${PORT}`))
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB")
   })
-  .catch(err => console.error('Connection Error:', err));
+  .catch((err) => {
+    console.error("MongoDB Connection Error:", err)
+    process.exit(1)
+  })
 
-app.get('/', (req, res) => {
-  res.send('Samyati Backend');
-});
+// Routes
+app.get("/", (req, res) => {
+  res.send("Samyati API is running")
+})
 
 // Import routes
-// const userRoutes = require('./routes/UserRoutes');
-const blogRoutes = require('./routes/blogRoutes');
+const blogRoutes = require("./routes/blogRoutes")
+const userRoutes = require("./routes/userRoutes")
+const adminRoutes = require("./routes/adminRoutes")
 
-// Use Routes
-// app.use('/api/users', userRoutes);
-app.use('/api/blogs', blogRoutes);
+// Use routes
+app.use("/api/blogs", blogRoutes)
+app.use("/api/users", userRoutes)
+app.use("/api/admin", adminRoutes)
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).json({
+    message: "Something went wrong!",
+    error: process.env.NODE_ENV === "development" ? err.message : "Server error",
+  })
+})
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})

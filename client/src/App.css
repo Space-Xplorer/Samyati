@@ -1,15 +1,39 @@
-/* App.css */
-:root {
-  --primary-dark: #2A4B7A;    /* Deep teal from mountain shadows */
-  --accent-green: #4A7C59;    /* Muted green from vegetation */
-  --warm-terracotta: #DAA588; /* Warm tone from earth colors */
-  --clean-white: #F8F9FA;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+:root {
+  --primary-dark: #2a4b7a; /* Deep teal from mountain shadows */
+  --accent-green: #4a7c59; /* Muted green from vegetation */
+  --warm-terracotta: #daa588; /* Warm tone from earth colors */
+  --clean-white: #f8f9fa;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+/* Fix for the main content area */
+.min-vh-100 {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main.flex-grow-1 {
+  flex: 1;
+  padding-top: 56px; /* Height of the navbar */
+}
+
+/* Hero section */
 .hero-section {
-  background-image: 
-    linear-gradient(rgba(42, 75, 122, 0.7), rgba(42, 75, 122, 0.7)),
-    url('https://www.hoteldekho.com/blog/wp-content/uploads/2022/04/Beautiful-Scenic-places-in-India.jpeg');
+  background-image: linear-gradient(rgba(42, 75, 122, 0.7), rgba(42, 75, 122, 0.7)),
+    url("https://www.hoteldekho.com/blog/wp-content/uploads/2022/04/Beautiful-Scenic-places-in-India.jpeg");
   background-size: cover;
   background-position: center;
   background-blend-mode: multiply;
@@ -18,11 +42,13 @@
   align-items: center;
   justify-content: center;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  margin-top: -56px; /* Offset the navbar padding */
 }
 
 .hero-content {
   max-width: 800px;
   padding: 2rem;
+  text-align: center;
 }
 
 .hero-title {
@@ -33,50 +59,204 @@
   margin-bottom: 1.5rem;
 }
 
+/* Buttons */
 .btn-primary {
   background-color: var(--accent-green);
   border: none;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .btn-success {
   background-color: var(--warm-terracotta);
   border: none;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #3A6548;
+  background-color: #3a6548;
   transform: translateY(-2px);
 }
 
 .btn-success:hover {
-  background-color: #C28F6F;
+  background-color: #c28f6f;
   transform: translateY(-2px);
 }
 
+/* Navbar */
 .navbar-dark {
   background-color: var(--primary-dark) !important;
-  padding: 1rem 0;
+  padding: 0.75rem 0;
 }
 
+.navbar-dark .navbar-brand {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.navbar-dark .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  transition: color 0.2s ease;
+}
+
+.navbar-dark .nav-link:hover {
+  color: #fff !important;
+}
+
+/* Blog cards */
 .blog-card {
   transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  overflow: hidden;
 }
 
 .blog-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .card-img-top {
+  height: 200px;
+  object-fit: cover;
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .card-body {
   background: var(--clean-white);
+  padding: 1.5rem;
 }
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.card-text {
+  color: #555;
+}
+
+/* Forms */
+.form-control {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+}
+
+.form-control:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 0.2rem rgba(74, 124, 89, 0.25);
+}
+
+/* Footer */
+footer {
+  background-color: var(--primary-dark);
+  color: #fff;
+  padding: 2rem 0;
+  margin-top: 2rem;
+}
+
+footer h5 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+footer a {
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.2s ease;
+}
+
+footer a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Profile page */
+.profile-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+/* Admin dashboard */
+.dashboard-card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Blog details page */
+.blog-content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-buttons .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .hero-buttons .btn:last-child {
+    margin-bottom: 0;
+  }
+
+  .card-img-top {
+    height: 180px;
+  }
+}
+
+/* Fix for the CreateBlog form */
+.shadow.p-4.bg-white.rounded {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Center content in containers */
+.container.py-5 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* Fix for blog details page */
+.blog-details-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Fix for profile page */
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Fix for admin dashboard */
+.admin-dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
