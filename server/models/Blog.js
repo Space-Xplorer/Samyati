@@ -5,6 +5,7 @@ const BlogSchema = new mongoose.Schema(
     title: { type: String, required: true },
     content: { type: String, required: true },
     author: { type: String, required: true }, // Clerk user ID
+    authorUsername: { type: String, default: "Unknown Author" }, // Store username for display
     image: {
       data: Buffer,
       contentType: String,
@@ -14,6 +15,7 @@ const BlogSchema = new mongoose.Schema(
       {
         text: String,
         author: { type: String }, // Clerk user ID
+        authorUsername: { type: String, default: "Anonymous" }, // Store username for display
         createdAt: { type: Date, default: Date.now },
       },
     ],

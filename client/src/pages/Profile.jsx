@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { Container, Row, Col, Card, Button, Form, Alert, Spinner } from "react-bootstrap"
+import { Container, Row, Col, Card, Button, Form, Alert, Spinner, Badge } from "react-bootstrap"
 import { useAuth } from "@clerk/clerk-react"
 
 export default function Profile() {
@@ -20,6 +20,8 @@ export default function Profile() {
     username: "",
     bio: "",
     profileImage: "",
+    country: "",
+    languages: "",
     twitter: "",
     instagram: "",
     facebook: "",
@@ -53,6 +55,8 @@ export default function Profile() {
             username: data.user.username || "",
             bio: data.user.bio || "",
             profileImage: data.user.profileImage || "",
+            country: data.user.country || "",
+            languages: data.user.languages ? data.user.languages.join(", ") : "",
             twitter: data.user.socialLinks?.twitter || "",
             instagram: data.user.socialLinks?.instagram || "",
             facebook: data.user.socialLinks?.facebook || "",
@@ -99,18 +103,10 @@ export default function Profile() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-
-    if (["twitter", "instagram", "facebook"].includes(name)) {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -118,6 +114,14 @@ export default function Profile() {
 
     try {
       const token = await getToken()
+
+      // Parse languages from comma-separated string to array
+      const languagesArray = formData.languages
+        ? formData.languages
+            .split(",")
+            .map((lang) => lang.trim())
+            .filter((lang) => lang)
+        : []
 
       const response = await fetch("http://localhost:5000/api/users/profile", {
         method: "POST",
@@ -129,6 +133,8 @@ export default function Profile() {
           username: formData.username,
           bio: formData.bio,
           profileImage: formData.profileImage,
+          country: formData.country,
+          languages: languagesArray,
           socialLinks: {
             twitter: formData.twitter,
             instagram: formData.instagram,
@@ -191,7 +197,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <Container className="py-5 text-center">
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -222,10 +228,10 @@ export default function Profile() {
   }
 
   return (
-    <Container className="py-5 profile-container">
+    <Container className="profile-container">
       <Row>
         <Col md={4}>
-          <Card className="mb-4 shadow-sm">
+          <Card className="mb-4 shadow-sm profile-card">
             <Card.Body className="text-center">
               {profile.profileImage ? (
                 <img
@@ -279,10 +285,30 @@ export default function Profile() {
           </Card>
 
           {!isEditing && (
-            <Card className="shadow-sm">
+            <Card className="shadow-sm profile-card">
               <Card.Body>
                 <h5 className="mb-3">About</h5>
                 <p>{profile.bio || "No bio available"}</p>
+
+                {profile.country && (
+                  <div className="mb-3">
+                    <h6>Country</h6>
+                    <p>{profile.country}</p>
+                  </div>
+                )}
+
+                {profile.languages && profile.languages.length > 0 && (
+                  <div className="mb-3">
+                    <h6>Languages</h6>
+                    <div className="d-flex flex-wrap gap-1">
+                      {profile.languages.map((lang, index) => (
+                        <Badge key={index} bg="secondary" className="me-1 mb-1">
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {profile.socialLinks && Object.values(profile.socialLinks).some((link) => link) && (
                   <>
@@ -326,7 +352,7 @@ export default function Profile() {
           )}
 
           {isEditing && (
-            <Card className="shadow-sm">
+            <Card className="shadow-sm profile-card">
               <Card.Body>
                 <h5 className="mb-3">Edit Profile</h5>
                 <Form onSubmit={handleSubmit}>
@@ -343,7 +369,37 @@ export default function Profile() {
 
                   <Form.Group className="mb-3">
                     <Form.Label>Bio</Form.Label>
-                    <Form.Control as="textarea" rows={3} name="bio" value={formData.bio} onChange={handleInputChange} />
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleInputChange}
+                      placeholder="Tell us about yourself and your travel experiences..."
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Country</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      placeholder="Your country of residence"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Languages</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="languages"
+                      value={formData.languages}
+                      onChange={handleInputChange}
+                      placeholder="English, Spanish, French (comma separated)"
+                    />
+                    <Form.Text className="text-muted">Separate languages with commas</Form.Text>
                   </Form.Group>
 
                   <Form.Group className="mb-3">

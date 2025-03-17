@@ -5,17 +5,21 @@
 }
 
 :root {
-  --primary-dark: #2a4b7a; /* Deep teal from mountain shadows */
+  --primary-dark: #2a4b7a; /* Deep blue from mountain shadows */
   --accent-green: #4a7c59; /* Muted green from vegetation */
   --warm-terracotta: #daa588; /* Warm tone from earth colors */
   --clean-white: #f8f9fa;
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
 }
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-dark);
   background-color: #f5f5f5;
+  min-height: 100vh;
 }
 
 /* Fix for the main content area */
@@ -28,21 +32,25 @@ body {
 main.flex-grow-1 {
   flex: 1;
   padding-top: 56px; /* Height of the navbar */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Hero section */
 .hero-section {
   background-image: linear-gradient(rgba(42, 75, 122, 0.7), rgba(42, 75, 122, 0.7)),
-    url("https://www.hoteldekho.com/blog/wp-content/uploads/2022/04/Beautiful-Scenic-places-in-India.jpeg");
+    url("https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?q=80&w=2070");
   background-size: cover;
   background-position: center;
   background-blend-mode: multiply;
-  height: 100vh;
+  min-height: calc(100vh - 56px);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
   margin-top: -56px; /* Offset the navbar padding */
+  padding: 2rem;
 }
 
 .hero-content {
@@ -57,6 +65,49 @@ main.flex-grow-1 {
   font-weight: 600;
   letter-spacing: -0.5px;
   margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+  color: var(--clean-white);
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* About section */
+.about-section {
+  padding: 5rem 0;
+  background-color: var(--clean-white);
+}
+
+.about-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--primary-dark);
+}
+
+.about-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.feature-card {
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--accent-green);
 }
 
 /* Buttons */
@@ -155,7 +206,7 @@ main.flex-grow-1 {
 /* Footer */
 footer {
   background-color: var(--primary-dark);
-  color: #fff;
+  color: var(--text-light);
   padding: 2rem 0;
   margin-top: 2rem;
 }
@@ -163,16 +214,26 @@ footer {
 footer h5 {
   font-weight: 600;
   margin-bottom: 1rem;
+  color: var(--text-light);
+}
+
+footer p {
+  color: var(--text-light);
 }
 
 footer a {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   transition: color 0.2s ease;
+  text-decoration: none;
 }
 
 footer a:hover {
-  color: #fff;
+  color: var(--text-light);
   text-decoration: none;
+}
+
+footer .text-muted {
+  color: var(--text-muted) !important;
 }
 
 /* Profile page */
@@ -183,6 +244,19 @@ footer a:hover {
   border-radius: 50%;
   margin: 0 auto 1rem;
   display: block;
+}
+
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.profile-card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 /* Admin dashboard */
@@ -197,6 +271,12 @@ footer a:hover {
   transform: translateY(-5px);
 }
 
+.admin-dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
 /* Blog details page */
 .blog-content {
   font-size: 1.1rem;
@@ -205,6 +285,17 @@ footer a:hover {
 
 .blog-content p {
   margin-bottom: 1.5rem;
+}
+
+.blog-details-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--primary-dark);
 }
 
 /* Responsive adjustments */
@@ -229,9 +320,10 @@ footer a:hover {
 }
 
 /* Fix for the CreateBlog form */
-.shadow.p-4.bg-white.rounded {
+.create-blog-container {
   max-width: 800px;
   margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
 /* Center content in containers */
@@ -242,21 +334,10 @@ footer a:hover {
   padding-bottom: 2rem !important;
 }
 
-/* Fix for blog details page */
-.blog-details-container {
-  max-width: 900px;
+/* Auth pages */
+.auth-container {
+  max-width: 500px;
   margin: 0 auto;
-}
-
-/* Fix for profile page */
-.profile-container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-/* Fix for admin dashboard */
-.admin-dashboard-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 2rem 1rem;
 }
 

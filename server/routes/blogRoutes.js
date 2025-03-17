@@ -1,6 +1,7 @@
 const express = require("express")
 const multer = require("multer")
 const Blog = require("../models/Blog")
+const User = require("../models/User")
 const clerkAuth = require("../middleware/clerkAuth")
 const router = express.Router()
 
@@ -47,10 +48,15 @@ router.post("/", clerkAuth, upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "Title and content are required" })
     }
 
+    // Get user info for author details
+    const user = await User.findOne({ clerkId: req.auth.userId })
+    const authorUsername = user ? user.username : "Unknown Author"
+
     const newBlog = new Blog({
       title: req.body.title,
       content: req.body.content,
       author: req.auth.userId, // Use Clerk user ID
+      authorUsername: authorUsername, // Store username for display
       image: req.file
         ? {
             data: req.file.buffer,
@@ -68,6 +74,7 @@ router.post("/", clerkAuth, upload.single("image"), async (req, res) => {
         _id: savedBlog._id,
         title: savedBlog.title,
         author: savedBlog.author,
+        authorUsername: savedBlog.authorUsername,
       },
     })
   } catch (error) {
@@ -96,10 +103,80 @@ router.get("/:id", async (req, res) => {
       }
     }
 
+    // Get author details if not already included
+    if (!blogObj.authorUsername && blogObj.author) {
+      try {
+        const author = await User.findOne({ clerkId: blogObj.author })
+        if (author) {
+          blogObj.authorUsername = author.username
+        }
+      } catch (err) {
+        console.error("Error fetching author details:", err)
+      }
+    }
+
+    // Get comment author usernames if not already included
+    if (blogObj.comments && blogObj.comments.length > 0) {
+      for (let i = 0; i < blogObj.comments.length; i++) {
+        if (!blogObj.comments[i].authorUsername && blogObj.comments[i].author) {
+          try {
+            const commentAuthor = await User.findOne({ clerkId: blogObj.comments[i].author })
+            if (commentAuthor) {
+              blogObj.comments[i].authorUsername = commentAuthor.username
+            }
+          } catch (err) {
+            console.error("Error fetching comment author details:", err)
+          }
+        }
+      }
+    }
+
     res.json(blogObj)
   } catch (error) {
     console.error("Error fetching blog:", error)
     res.status(500).json({ error: "Failed to fetch blog" })
+  }
+})
+
+// Update a blog post (edit)
+router.put("/:id", clerkAuth, upload.single("image"), async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id)
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" })
+    }
+
+    // Check if the user is the author of the blog
+    if (blog.author !== req.auth.userId) {
+      return res.status(403).json({ error: "You can only edit your own blogs" })
+    }
+
+    // Update blog fields
+    blog.title = req.body.title || blog.title
+    blog.content = req.body.content || blog.content
+
+    // Update image if provided
+    if (req.file) {
+      blog.image = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      }
+    }
+
+    await blog.save()
+
+    res.json({
+      message: "Blog updated successfully",
+      blog: {
+        _id: blog._id,
+        title: blog.title,
+        content: blog.content,
+      },
+    })
+  } catch (error) {
+    console.error("Error updating blog:", error)
+    res.status(500).json({ error: "Failed to update blog" })
   }
 })
 
@@ -140,9 +217,14 @@ router.post("/:id/comment", clerkAuth, async (req, res) => {
       return res.status(404).json({ error: "Blog not found" })
     }
 
+    // Get user info for comment author details
+    const user = await User.findOne({ clerkId: req.auth.userId })
+    const authorUsername = user ? user.username : "Anonymous"
+
     blog.comments.push({
       text: req.body.text,
       author: req.auth.userId,
+      authorUsername: authorUsername,
     })
 
     await blog.save()

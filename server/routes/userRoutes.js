@@ -23,7 +23,7 @@ const isAdmin = async (req, res, next) => {
 // Create or update user profile
 router.post("/profile", clerkAuth, async (req, res) => {
   try {
-    const { email, username, bio, profileImage, socialLinks } = req.body
+    const { email, username, bio, profileImage, socialLinks, country, languages } = req.body
 
     // Find user by Clerk ID or create a new one
     let user = await User.findOne({ clerkId: req.auth.userId })
@@ -35,15 +35,19 @@ router.post("/profile", clerkAuth, async (req, res) => {
       user.bio = bio !== undefined ? bio : user.bio
       user.profileImage = profileImage || user.profileImage
       user.socialLinks = socialLinks || user.socialLinks
+      user.country = country || user.country
+      user.languages = languages || user.languages
     } else {
-      // Create new user
+      // Create new user with default values
       user = new User({
         clerkId: req.auth.userId,
-        email,
-        username,
+        email: email || req.auth.tokenPayload?.email || "",
+        username: username || req.auth.tokenPayload?.name || "Traveler",
         bio: bio || "",
         profileImage: profileImage || "",
         socialLinks: socialLinks || {},
+        country: country || "",
+        languages: languages || [],
       })
     }
 
@@ -60,6 +64,8 @@ router.post("/profile", clerkAuth, async (req, res) => {
         bio: user.bio,
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
+        country: user.country,
+        languages: user.languages,
         createdAt: user.createdAt,
       },
     })
@@ -72,10 +78,22 @@ router.post("/profile", clerkAuth, async (req, res) => {
 // Get user profile
 router.get("/profile", clerkAuth, async (req, res) => {
   try {
-    const user = await User.findOne({ clerkId: req.auth.userId })
+    let user = await User.findOne({ clerkId: req.auth.userId })
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" })
+      // Create a new user with default values from Clerk token
+      user = new User({
+        clerkId: req.auth.userId,
+        email: req.auth.tokenPayload?.email || "",
+        username: req.auth.tokenPayload?.name || "Traveler",
+        bio: "",
+        profileImage: "",
+        socialLinks: {},
+        country: "",
+        languages: [],
+      })
+
+      await user.save()
     }
 
     res.status(200).json({
@@ -88,6 +106,10 @@ router.get("/profile", clerkAuth, async (req, res) => {
         bio: user.bio,
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
+        country: user.country,
+        languages: user.languages,
+        following: user.following,
+        followers: user.followers,
         createdAt: user.createdAt,
       },
     })
@@ -115,6 +137,8 @@ router.get("/profile/:clerkId", async (req, res) => {
         bio: user.bio,
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
+        country: user.country,
+        languages: user.languages,
         followersCount: user.followers.length,
         followingCount: user.following.length,
       },
@@ -153,8 +177,8 @@ router.post("/follow/:clerkId", clerkAuth, async (req, res) => {
       // Create a new user record if it doesn't exist
       currentUser = new User({
         clerkId: req.auth.userId,
-        email: req.body.email || "unknown",
-        username: req.body.username || "user",
+        email: req.body.email || req.auth.tokenPayload?.email || "unknown",
+        username: req.body.username || req.auth.tokenPayload?.name || "user",
       })
     }
 

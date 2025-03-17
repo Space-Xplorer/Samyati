@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
-import { Container, Card, Spinner, Alert, Form, Button } from "react-bootstrap"
+import { useParams, Link, useNavigate } from "react-router-dom"
+import { Container, Card, Spinner, Alert, Form, Button, Modal } from "react-bootstrap"
 import { useAuth } from "@clerk/clerk-react"
 
 export default function BlogDetails() {
   const { id } = useParams()
   const { userId, getToken, isSignedIn } = useAuth()
+  const navigate = useNavigate()
 
   const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -15,6 +16,13 @@ export default function BlogDetails() {
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [liking, setLiking] = useState(false)
+
+  // Edit blog state
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editTitle, setEditTitle] = useState("")
+  const [editContent, setEditContent] = useState("")
+  const [editImage, setEditImage] = useState(null)
+  const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -27,6 +35,10 @@ export default function BlogDetails() {
 
         const data = await response.json()
         setBlog(data)
+
+        // Set edit form initial values
+        setEditTitle(data.title)
+        setEditContent(data.content)
       } catch (error) {
         console.error("Fetch error:", error)
         setError("Failed to load blog. Please try again later.")
@@ -109,9 +121,54 @@ export default function BlogDetails() {
     }
   }
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!editTitle.trim() || !editContent.trim()) {
+      return
+    }
+
+    try {
+      setUpdating(true)
+      const token = await getToken()
+
+      const formData = new FormData()
+      formData.append("title", editTitle)
+      formData.append("content", editContent)
+      if (editImage) {
+        formData.append("image", editImage)
+      }
+
+      const response = await fetch(`http://localhost:5000/api/blogs/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to update blog")
+      }
+
+      // Refresh the blog data
+      const updatedResponse = await fetch(`http://localhost:5000/api/blogs/${id}`)
+      const updatedBlog = await updatedResponse.json()
+      setBlog(updatedBlog)
+
+      setShowEditModal(false)
+    } catch (error) {
+      console.error("Update error:", error)
+      setError(error.message)
+    } finally {
+      setUpdating(false)
+    }
+  }
+
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center py-5">
+      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
@@ -141,8 +198,10 @@ export default function BlogDetails() {
     )
   }
 
+  const isAuthor = userId === blog.author
+
   return (
-    <Container className="py-5 blog-details-container">
+    <Container className="blog-details-container">
       <Link to="/blogs" className="btn btn-outline-primary mb-4">
         &larr; Back to Blogs
       </Link>
@@ -159,10 +218,20 @@ export default function BlogDetails() {
         )}
 
         <Card.Body className="p-4">
-          <h1 className="mb-3">{blog.title}</h1>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h1 className="mb-0">{blog.title}</h1>
+
+            {isAuthor && (
+              <Button variant="outline-secondary" size="sm" onClick={() => setShowEditModal(true)}>
+                Edit Blog
+              </Button>
+            )}
+          </div>
 
           <div className="d-flex justify-content-between mb-4">
-            <small className="text-muted">Posted on {new Date(blog.createdAt).toLocaleDateString()}</small>
+            <small className="text-muted">
+              By {blog.authorUsername || "Unknown Author"} • Posted on {new Date(blog.createdAt).toLocaleDateString()}
+            </small>
 
             <div>
               <Button
@@ -223,6 +292,7 @@ export default function BlogDetails() {
                 {blog.comments.map((comment, index) => (
                   <Card key={index} className="mb-3 shadow-sm">
                     <Card.Body>
+                      <div className="comment-author mb-2">{comment.authorUsername || "Anonymous"}</div>
                       <Card.Text>{comment.text}</Card.Text>
                       <Card.Subtitle className="text-muted">
                         <small>Posted on {new Date(comment.createdAt).toLocaleDateString()}</small>
@@ -237,6 +307,47 @@ export default function BlogDetails() {
           </div>
         </Card.Body>
       </Card>
+
+      {/* Edit Blog Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Blog</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleEditSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label>Blog Title</Form.Label>
+              <Form.Control type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Content</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={10}
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Update Image (optional)</Form.Label>
+              <Form.Control type="file" onChange={(e) => setEditImage(e.target.files[0])} accept="image/*" />
+              <Form.Text className="text-muted">Leave empty to keep the current image</Form.Text>
+            </Form.Group>
+
+            <div className="d-flex justify-content-end gap-2">
+              <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" disabled={updating}>
+                {updating ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </Container>
   )
 }

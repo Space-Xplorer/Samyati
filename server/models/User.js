@@ -28,6 +28,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    country: {
+      type: String,
+      default: "",
+    },
+    languages: {
+      type: [String],
+      default: [],
+    },
     socialLinks: {
       twitter: String,
       instagram: String,
