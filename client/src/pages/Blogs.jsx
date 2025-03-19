@@ -1,8 +1,7 @@
-"use client"
-
 import { useEffect, useState } from "react"
-import { Card, Container, Row, Col, Spinner, Alert, Button } from "react-bootstrap"
+import { Card, Row, Col, Spinner, Alert, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
+import { API_ENDPOINTS } from "../config/api"
 
 export default function Blogs() {
   const [blogs, setBlogs] = useState([])
@@ -12,7 +11,7 @@ export default function Blogs() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/blogs")
+        const response = await fetch(API_ENDPOINTS.blogs)
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -34,25 +33,25 @@ export default function Blogs() {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center py-5">
+      <div className="blogs-container d-flex justify-content-center align-items-center">
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
-      </Container>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <Container className="py-5">
+      <div className="blogs-container">
         <Alert variant="danger">{error}</Alert>
-      </Container>
+      </div>
     )
   }
 
   if (blogs.length === 0) {
     return (
-      <Container className="py-5">
+      <div className="blogs-container">
         <h2 className="mb-4">Recent Travel Blogs</h2>
         <Alert variant="info">
           <p>No blogs found. Be the first to share your travel story!</p>
@@ -62,17 +61,17 @@ export default function Blogs() {
             </Button>
           </div>
         </Alert>
-      </Container>
+      </div>
     )
   }
 
   return (
-    <Container className="py-5">
+    <div className="blogs-container">
       <h2 className="mb-4">Recent Travel Blogs</h2>
       <Row xs={1} md={2} lg={3} className="g-4">
         {blogs.map((blog) => (
           <Col key={blog._id}>
-            <Card className="h-100 shadow-sm blog-card">
+            <Card className="h-100 blog-card">
               {blog.image && blog.image.data && (
                 <Card.Img
                   variant="top"
@@ -100,7 +99,7 @@ export default function Blogs() {
           </Col>
         ))}
       </Row>
-    </Container>
+    </div>
   )
 }
 

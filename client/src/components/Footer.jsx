@@ -3,9 +3,9 @@ import { Link } from "react-router-dom"
 
 export default function Footer() {
   return (
-    <footer className="bg-dark text-white py-4">
-      <Container>
-        <Row>
+    <footer className="bg-dark text-white py-4 w-100">
+      <Container className="w-100">
+        <Row className="w-100">
           <Col md={4} className="mb-3 mb-md-0">
             <h5>Samyati</h5>
             <p className="text-white">Share your travel stories with the world.</p>
@@ -48,7 +48,7 @@ export default function Footer() {
           </Col>
         </Row>
 
-        <div className="text-center mt-4">
+        <div className="text-center mt-4 w-100">
           <p className="text-white mb-0">&copy; {new Date().getFullYear()} Samyati. All rights reserved.</p>
         </div>
       </Container>

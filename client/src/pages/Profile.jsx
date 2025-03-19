@@ -1,19 +1,20 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import { Container, Row, Col, Card, Button, Form, Alert, Spinner, Badge } from "react-bootstrap"
-import { useAuth } from "@clerk/clerk-react"
+import { Row, Col, Card, Button, Form, Alert, Spinner } from "react-bootstrap"
+import { useAuth, useUser } from "@clerk/clerk-react"
+import { API_ENDPOINTS } from "../config/api"
 
 export default function Profile() {
   const { clerkId } = useParams()
   const { userId, getToken, isSignedIn } = useAuth()
+  const { user } = useUser()
 
   const [profile, setProfile] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [userBlogs, setUserBlogs] = useState([])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -21,7 +22,6 @@ export default function Profile() {
     bio: "",
     profileImage: "",
     country: "",
-    languages: "",
     twitter: "",
     instagram: "",
     facebook: "",
@@ -37,7 +37,7 @@ export default function Profile() {
         // If it's the user's own profile and they're signed in
         if (isOwnProfile && isSignedIn) {
           const token = await getToken()
-          const response = await fetch("http://localhost:5000/api/users/profile", {
+          const response = await fetch(`${API_ENDPOINTS.users}/profile`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -54,31 +54,41 @@ export default function Profile() {
           setFormData({
             username: data.user.username || "",
             bio: data.user.bio || "",
-            profileImage: data.user.profileImage || "",
+            profileImage: data.user.profileImage || user?.imageUrl || "",
             country: data.user.country || "",
-            languages: data.user.languages ? data.user.languages.join(", ") : "",
             twitter: data.user.socialLinks?.twitter || "",
             instagram: data.user.socialLinks?.instagram || "",
             facebook: data.user.socialLinks?.facebook || "",
           })
+
+          // Fetch user's blogs
+          const blogsResponse = await fetch(`${API_ENDPOINTS.blogs}/user/${clerkId}`)
+          if (blogsResponse.ok) {
+            const blogsData = await blogsResponse.json()
+            setUserBlogs(blogsData)
+          }
         } else {
           // Fetch public profile
-          const response = await fetch(`http://localhost:5000/api/users/profile/${clerkId}`)
+          const response = await fetch(`${API_ENDPOINTS.users}/profile/${clerkId}`)
 
           if (!response.ok) {
             throw new Error("Failed to fetch profile")
           }
 
           const data = await response.json()
-          setProfile({
-            ...data.user,
-            blogs: data.blogs,
-          })
+          setProfile(data.user)
+
+          // Fetch user's blogs
+          const blogsResponse = await fetch(`${API_ENDPOINTS.blogs}/user/${clerkId}`)
+          if (blogsResponse.ok) {
+            const blogsData = await blogsResponse.json()
+            setUserBlogs(blogsData)
+          }
 
           // Check if current user is following this profile
           if (isSignedIn) {
             const token = await getToken()
-            const userResponse = await fetch("http://localhost:5000/api/users/profile", {
+            const userResponse = await fetch(`${API_ENDPOINTS.users}/profile`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -99,7 +109,7 @@ export default function Profile() {
     }
 
     fetchProfile()
-  }, [clerkId, isSignedIn, isOwnProfile, userId, getToken])
+  }, [clerkId, isSignedIn, isOwnProfile, userId, getToken, user])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -115,15 +125,7 @@ export default function Profile() {
     try {
       const token = await getToken()
 
-      // Parse languages from comma-separated string to array
-      const languagesArray = formData.languages
-        ? formData.languages
-            .split(",")
-            .map((lang) => lang.trim())
-            .filter((lang) => lang)
-        : []
-
-      const response = await fetch("http://localhost:5000/api/users/profile", {
+      const response = await fetch(`${API_ENDPOINTS.users}/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,9 +134,8 @@ export default function Profile() {
         body: JSON.stringify({
           username: formData.username,
           bio: formData.bio,
-          profileImage: formData.profileImage,
+          profileImage: formData.profileImage || user?.imageUrl,
           country: formData.country,
-          languages: languagesArray,
           socialLinks: {
             twitter: formData.twitter,
             instagram: formData.instagram,
@@ -163,7 +164,7 @@ export default function Profile() {
       const token = await getToken()
       const endpoint = isFollowing ? "unfollow" : "follow"
 
-      const response = await fetch(`http://localhost:5000/api/users/${endpoint}/${clerkId}`, {
+      const response = await fetch(`${API_ENDPOINTS.users}/${endpoint}/${clerkId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -197,45 +198,45 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
+      <div className="profile-container d-flex justify-content-center align-items-center">
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
-      </Container>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <Container className="py-5">
+      <div className="profile-container">
         <Alert variant="danger">{error}</Alert>
         <Button as={Link} to="/blogs" variant="primary">
           Back to Blogs
         </Button>
-      </Container>
+      </div>
     )
   }
 
   if (!profile) {
     return (
-      <Container className="py-5">
+      <div className="profile-container">
         <Alert variant="warning">Profile not found</Alert>
         <Button as={Link} to="/blogs" variant="primary">
           Back to Blogs
         </Button>
-      </Container>
+      </div>
     )
   }
 
   return (
-    <Container className="profile-container">
+    <div className="profile-container">
       <Row>
         <Col md={4}>
-          <Card className="mb-4 shadow-sm profile-card">
+          <Card className="mb-4 profile-card">
             <Card.Body className="text-center">
-              {profile.profileImage ? (
+              {profile.profileImage || user?.imageUrl ? (
                 <img
-                  src={profile.profileImage || "/placeholder.svg"}
+                  src={profile.profileImage || user?.imageUrl || "/placeholder.svg"}
                   alt={profile.username}
                   className="profile-image"
                 />
@@ -285,7 +286,7 @@ export default function Profile() {
           </Card>
 
           {!isEditing && (
-            <Card className="shadow-sm profile-card">
+            <Card className="profile-card">
               <Card.Body>
                 <h5 className="mb-3">About</h5>
                 <p>{profile.bio || "No bio available"}</p>
@@ -294,19 +295,6 @@ export default function Profile() {
                   <div className="mb-3">
                     <h6>Country</h6>
                     <p>{profile.country}</p>
-                  </div>
-                )}
-
-                {profile.languages && profile.languages.length > 0 && (
-                  <div className="mb-3">
-                    <h6>Languages</h6>
-                    <div className="d-flex flex-wrap gap-1">
-                      {profile.languages.map((lang, index) => (
-                        <Badge key={index} bg="secondary" className="me-1 mb-1">
-                          {lang}
-                        </Badge>
-                      ))}
-                    </div>
                   </div>
                 )}
 
@@ -352,7 +340,7 @@ export default function Profile() {
           )}
 
           {isEditing && (
-            <Card className="shadow-sm profile-card">
+            <Card className="profile-card">
               <Card.Body>
                 <h5 className="mb-3">Edit Profile</h5>
                 <Form onSubmit={handleSubmit}>
@@ -391,18 +379,6 @@ export default function Profile() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Languages</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="languages"
-                      value={formData.languages}
-                      onChange={handleInputChange}
-                      placeholder="English, Spanish, French (comma separated)"
-                    />
-                    <Form.Text className="text-muted">Separate languages with commas</Form.Text>
-                  </Form.Group>
-
-                  <Form.Group className="mb-3">
                     <Form.Label>Profile Image URL</Form.Label>
                     <Form.Control
                       type="text"
@@ -411,6 +387,7 @@ export default function Profile() {
                       onChange={handleInputChange}
                       placeholder="https://example.com/image.jpg"
                     />
+                    <Form.Text className="text-muted">Leave empty to use your Clerk profile image</Form.Text>
                   </Form.Group>
 
                   <h5 className="mt-4 mb-3">Social Links</h5>
@@ -465,17 +442,24 @@ export default function Profile() {
         <Col md={8}>
           <h4 className="mb-4">{isOwnProfile ? "Your Blogs" : `${profile.username}'s Blogs`}</h4>
 
-          {profile.blogs && profile.blogs.length > 0 ? (
+          {userBlogs && userBlogs.length > 0 ? (
             <Row xs={1} md={2} className="g-4">
-              {profile.blogs.map((blog) => (
+              {userBlogs.map((blog) => (
                 <Col key={blog._id}>
-                  <Card className="h-100 shadow-sm blog-card">
+                  <Card className="h-100 blog-card">
+                    {blog.image && blog.image.data && (
+                      <Card.Img
+                        variant="top"
+                        src={`data:${blog.image.contentType};base64,${blog.image.data}`}
+                        alt={blog.title}
+                      />
+                    )}
                     <Card.Body>
                       <Card.Title>{blog.title}</Card.Title>
                       <Card.Text>
                         <small className="text-muted">
-                          {new Date(blog.createdAt).toLocaleDateString()} •{blog.likesCount || 0} likes •
-                          {blog.commentsCount || 0} comments
+                          {new Date(blog.createdAt).toLocaleDateString()} •{blog.likes?.length || 0} likes •
+                          {blog.comments?.length || 0} comments
                         </small>
                       </Card.Text>
                       <Link to={`/blogs/${blog._id}`} className="btn btn-sm btn-primary">
@@ -500,7 +484,7 @@ export default function Profile() {
           )}
         </Col>
       </Row>
-    </Container>
+    </div>
   )
 }
 

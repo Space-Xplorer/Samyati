@@ -15,20 +15,34 @@ router.get("/", async (req, res) => {
     const blogs = await Blog.find().sort({ createdAt: -1 })
 
     // Transform the blogs to include base64 encoded images
-    const blogsWithFormattedImages = blogs.map((blog) => {
-      const blogObj = blog.toObject()
+    const blogsWithFormattedImages = await Promise.all(
+      blogs.map(async (blog) => {
+        const blogObj = blog.toObject()
 
-      if (blogObj.image && blogObj.image.data) {
-        return {
-          ...blogObj,
-          image: {
-            contentType: blogObj.image.contentType,
-            data: blogObj.image.data.toString("base64"),
-          },
+        // Get author username if not already included
+        if (!blogObj.authorUsername && blogObj.author) {
+          try {
+            const author = await User.findOne({ clerkId: blogObj.author })
+            if (author) {
+              blogObj.authorUsername = author.username
+            }
+          } catch (err) {
+            console.error("Error fetching author details:", err)
+          }
         }
-      }
-      return blogObj
-    })
+
+        if (blogObj.image && blogObj.image.data) {
+          return {
+            ...blogObj,
+            image: {
+              contentType: blogObj.image.contentType,
+              data: blogObj.image.data.toString("base64"),
+            },
+          }
+        }
+        return blogObj
+      }),
+    )
 
     res.json(blogsWithFormattedImages)
   } catch (error) {
@@ -123,9 +137,12 @@ router.get("/:id", async (req, res) => {
             const commentAuthor = await User.findOne({ clerkId: blogObj.comments[i].author })
             if (commentAuthor) {
               blogObj.comments[i].authorUsername = commentAuthor.username
+            } else {
+              blogObj.comments[i].authorUsername = "Anonymous"
             }
           } catch (err) {
             console.error("Error fetching comment author details:", err)
+            blogObj.comments[i].authorUsername = "Anonymous"
           }
         }
       }
@@ -236,6 +253,34 @@ router.post("/:id/comment", clerkAuth, async (req, res) => {
   } catch (error) {
     console.error("Error adding comment:", error)
     res.status(500).json({ error: "Failed to add comment" })
+  }
+})
+
+// Get blogs by author
+router.get("/user/:clerkId", async (req, res) => {
+  try {
+    const blogs = await Blog.find({ author: req.params.clerkId }).sort({ createdAt: -1 })
+
+    // Transform the blogs to include base64 encoded images
+    const blogsWithFormattedImages = blogs.map((blog) => {
+      const blogObj = blog.toObject()
+
+      if (blogObj.image && blogObj.image.data) {
+        return {
+          ...blogObj,
+          image: {
+            contentType: blogObj.image.contentType,
+            data: blogObj.image.data.toString("base64"),
+          },
+        }
+      }
+      return blogObj
+    })
+
+    res.json(blogsWithFormattedImages)
+  } catch (error) {
+    console.error("Error fetching user blogs:", error)
+    res.status(500).json({ error: "Failed to fetch user blogs" })
   }
 })
 

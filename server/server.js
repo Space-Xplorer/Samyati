@@ -5,33 +5,18 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 const path = require("path")
 
-// Initialize Express app
 const app = express()
 const PORT = process.env.PORT || 5000
 
-// Middleware
-// Fix CORS to allow requests from any localhost port
 app.use(
   cors({
-    // Allow any localhost port for development
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl requests)
-      if (!origin) return callback(null, true)
-
-      // Allow all localhost origins regardless of port
-      if (origin.startsWith("http://localhost:")) {
-        return callback(null, true)
-      }
-
-      callback(new Error("Not allowed by CORS"))
-    },
+    origin: true, // Allow any origin in development
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 )
 
-// For preflight requests
 app.options("*", cors())
 
 app.use(express.json())
@@ -63,7 +48,7 @@ app.use("/api/blogs", blogRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/admin", adminRoutes)
 
-// Error handling middleware
+// middleware
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({

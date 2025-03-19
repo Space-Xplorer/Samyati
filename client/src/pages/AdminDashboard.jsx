@@ -1,9 +1,8 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Container, Row, Col, Card, Table, Button, Badge, Alert, Spinner, Tabs, Tab } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import { useAuth } from "@clerk/clerk-react"
+import { API_ENDPOINTS } from "../config/api"
 
 export default function AdminDashboard() {
   const { getToken } = useAuth()
@@ -21,7 +20,7 @@ export default function AdminDashboard() {
         setLoading(true)
         const token = await getToken()
 
-        const response = await fetch("http://localhost:5000/api/admin/dashboard", {
+        const response = await fetch(`${API_ENDPOINTS.admin}/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -36,7 +35,7 @@ export default function AdminDashboard() {
         setBlogs(data.recentBlogs)
 
         // Fetch all users
-        const usersResponse = await fetch("http://localhost:5000/api/users", {
+        const usersResponse = await fetch(API_ENDPOINTS.users, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -63,7 +62,7 @@ export default function AdminDashboard() {
     try {
       const token = await getToken()
 
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/role`, {
+      const response = await fetch(`${API_ENDPOINTS.users}/${userId}/role`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +91,7 @@ export default function AdminDashboard() {
     try {
       const token = await getToken()
 
-      const response = await fetch(`http://localhost:5000/api/admin/blogs/${blogId}`, {
+      const response = await fetch(`${API_ENDPOINTS.admin}/blogs/${blogId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -115,7 +114,7 @@ export default function AdminDashboard() {
     try {
       const token = await getToken()
 
-      const response = await fetch(`http://localhost:5000/api/admin/blogs/${blogId}/feature`, {
+      const response = await fetch(`${API_ENDPOINTS.admin}/blogs/${blogId}/feature`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

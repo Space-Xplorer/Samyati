@@ -1,9 +1,8 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { Container, Card, Spinner, Alert, Form, Button, Modal } from "react-bootstrap"
 import { useAuth } from "@clerk/clerk-react"
+import { API_ENDPOINTS } from "../config/api"
 
 export default function BlogDetails() {
   const { id } = useParams()
@@ -27,7 +26,7 @@ export default function BlogDetails() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/blogs/${id}`)
+        const response = await fetch(`${API_ENDPOINTS.blogs}/${id}`)
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`)
@@ -57,7 +56,7 @@ export default function BlogDetails() {
       setLiking(true)
       const token = await getToken()
 
-      const response = await fetch(`http://localhost:5000/api/blogs/${id}/like`, {
+      const response = await fetch(`${API_ENDPOINTS.blogs}/${id}/like`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,7 +91,7 @@ export default function BlogDetails() {
       setSubmitting(true)
       const token = await getToken()
 
-      const response = await fetch(`http://localhost:5000/api/blogs/${id}/comment`, {
+      const response = await fetch(`${API_ENDPOINTS.blogs}/${id}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -139,7 +138,7 @@ export default function BlogDetails() {
         formData.append("image", editImage)
       }
 
-      const response = await fetch(`http://localhost:5000/api/blogs/${id}`, {
+      const response = await fetch(`${API_ENDPOINTS.blogs}/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,7 +152,7 @@ export default function BlogDetails() {
       }
 
       // Refresh the blog data
-      const updatedResponse = await fetch(`http://localhost:5000/api/blogs/${id}`)
+      const updatedResponse = await fetch(`${API_ENDPOINTS.blogs}/${id}`)
       const updatedBlog = await updatedResponse.json()
       setBlog(updatedBlog)
 

@@ -3,6 +3,7 @@
 import { useNavigate } from "react-router-dom"
 import { Container, Row, Col, Button, Card } from "react-bootstrap"
 import { SignedIn, SignedOut } from "@clerk/clerk-react"
+import DestinationsCarousel from "../components/DestinationsCarousel"
 
 export default function Home() {
   const navigate = useNavigate()
@@ -30,6 +31,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <DestinationsCarousel />
 
       <section className="about-section">
         <Container>

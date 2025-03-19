@@ -1,6 +1,9 @@
+"use client"
+
+// App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react"
-import { Container, Navbar, Nav, Button, Spinner } from "react-bootstrap"
+import { useAuth } from "@clerk/clerk-react"
+import { Container, Spinner } from "react-bootstrap"
 import { useState, useEffect } from "react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./App.css"
@@ -14,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard"
 import Auth1 from "./components/auth1"
 import Auth2 from "./components/auth2"
 import Footer from "./components/Footer"
+import Navigation from "./components/Navigation"
 
 // Protected route component
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -69,65 +73,6 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   return children
-}
-
-const Navigation = () => {
-  const { userId, isSignedIn } = useAuth()
-  const [userRole, setUserRole] = useState(null)
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!isSignedIn || !userId) return
-
-      try {
-        // First try to get the user profile directly
-        const response = await fetch(`http://localhost:5000/api/users/profile/${userId}`)
-
-        if (response.ok) {
-          const data = await response.json()
-          setUserRole(data.user.role)
-        }
-      } catch (error) {
-        console.error("Error fetching user role:", error)
-      }
-    }
-
-    if (isSignedIn && userId) {
-      fetchUserRole()
-    }
-  }, [isSignedIn, userId])
-
-  return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="fixed-top">
-      <Container>
-        <Navbar.Brand href="/">Samyati</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="/blogs">All Blogs</Nav.Link>
-            {isSignedIn && (
-              <>
-                <Nav.Link href="/create-blog">Write a Blog</Nav.Link>
-                <Nav.Link href={`/profile/${userId}`}>My Profile</Nav.Link>
-                {userRole === "admin" && <Nav.Link href="/admin">Admin Dashboard</Nav.Link>}
-              </>
-            )}
-          </Nav>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <Button href="/auth1" variant="outline-light" className="me-2">
-              Sign In
-            </Button>
-            <Button href="/auth2" variant="outline-light">
-              Sign Up
-            </Button>
-          </SignedOut>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-  )
 }
 
 export default function App() {

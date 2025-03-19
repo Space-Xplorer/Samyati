@@ -6,20 +6,33 @@
 
 :root {
   --primary-dark: #2a4b7a; /* Deep blue from mountain shadows */
+  --primary-light: #3a5e96; /* Lighter blue for hover states */
   --accent-green: #4a7c59; /* Muted green from vegetation */
+  --accent-green-light: #5b9d6e; /* Lighter green for hover states */
   --warm-terracotta: #daa588; /* Warm tone from earth colors */
+  --warm-terracotta-light: #e6b69a; /* Lighter terracotta for hover states */
   --clean-white: #f8f9fa;
+  --off-white: #f0f2f5;
   --text-dark: #333333;
   --text-light: #ffffff;
   --text-muted: rgba(255, 255, 255, 0.7);
+  --border-color: #dee2e6;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
 }
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: var(--text-dark);
-  background-color: #f5f5f5;
+  background-color: var(--off-white);
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Fix for the main content area */
@@ -27,6 +40,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
 main.flex-grow-1 {
@@ -34,11 +48,25 @@ main.flex-grow-1 {
   padding-top: 56px; /* Height of the navbar */
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+/* Container styles for better desktop alignment */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 15px;
 }
 
 /* Hero section */
 .hero-section {
-  background-image: linear-gradient(rgba(42, 75, 122, 0.7), rgba(42, 75, 122, 0.7)),
+  background-image: linear-gradient(rgba(42, 75, 122, 0.8), rgba(42, 75, 122, 0.8)),
     url("https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?q=80&w=2070");
   background-size: cover;
   background-position: center;
@@ -51,6 +79,7 @@ main.flex-grow-1 {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
   margin-top: -56px; /* Offset the navbar padding */
   padding: 2rem;
+  width: 100%;
 }
 
 .hero-content {
@@ -77,6 +106,7 @@ main.flex-grow-1 {
 .about-section {
   padding: 5rem 0;
   background-color: var(--clean-white);
+  width: 100%;
 }
 
 .about-title {
@@ -84,24 +114,32 @@ main.flex-grow-1 {
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: var(--primary-dark);
+  text-align: center;
 }
 
 .about-text {
   font-size: 1.1rem;
   line-height: 1.8;
   margin-bottom: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .feature-card {
   padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   height: 100%;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--clean-white);
+  border: 1px solid var(--border-color);
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .feature-icon {
@@ -117,6 +155,7 @@ main.flex-grow-1 {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
 }
 
 .btn-success {
@@ -125,15 +164,49 @@ main.flex-grow-1 {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
 }
 
 .btn-primary:hover {
-  background-color: #3a6548;
+  background-color: var(--accent-green-light);
   transform: translateY(-2px);
 }
 
 .btn-success:hover {
-  background-color: #c28f6f;
+  background-color: var(--warm-terracotta-light);
+  transform: translateY(-2px);
+}
+
+/* Auth buttons with better contrast */
+.btn-auth-primary {
+  background-color: var(--primary-dark);
+  color: var(--text-light);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.btn-auth-secondary {
+  background-color: var(--warm-terracotta);
+  color: var(--text-light);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.btn-auth-primary:hover {
+  background-color: var(--primary-light);
+  color: var(--text-light);
+  transform: translateY(-2px);
+}
+
+.btn-auth-secondary:hover {
+  background-color: var(--warm-terracotta-light);
+  color: var(--text-light);
   transform: translateY(-2px);
 }
 
@@ -141,11 +214,14 @@ main.flex-grow-1 {
 .navbar-dark {
   background-color: var(--primary-dark) !important;
   padding: 0.75rem 0;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
 }
 
 .navbar-dark .navbar-brand {
   font-weight: 700;
   letter-spacing: 1px;
+  color: var(--text-light);
 }
 
 .navbar-dark .nav-link {
@@ -164,17 +240,20 @@ main.flex-grow-1 {
   transition: transform 0.2s, box-shadow 0.2s;
   border: none;
   overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  height: 100%;
 }
 
 .blog-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-img-top {
   height: 200px;
   object-fit: cover;
-  border-radius: 0.5rem 0.5rem 0 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .card-body {
@@ -185,6 +264,7 @@ main.flex-grow-1 {
 .card-title {
   font-weight: 600;
   margin-bottom: 0.75rem;
+  color: var(--primary-dark);
 }
 
 .card-text {
@@ -194,13 +274,20 @@ main.flex-grow-1 {
 /* Forms */
 .form-control {
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--clean-white);
 }
 
 .form-control:focus {
   border-color: var(--accent-green);
   box-shadow: 0 0 0 0.2rem rgba(74, 124, 89, 0.25);
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
 }
 
 /* Footer */
@@ -209,6 +296,7 @@ footer {
   color: var(--text-light);
   padding: 2rem 0;
   margin-top: 2rem;
+  width: 100%;
 }
 
 footer h5 {
@@ -244,37 +332,44 @@ footer .text-muted {
   border-radius: 50%;
   margin: 0 auto 1rem;
   display: block;
+  border: 3px solid var(--clean-white);
+  box-shadow: var(--shadow-md);
 }
 
 .profile-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  width: 100%;
 }
 
 .profile-card {
   border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  background-color: var(--clean-white);
 }
 
 /* Admin dashboard */
 .dashboard-card {
   border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   transition: transform 0.2s;
+  background-color: var(--clean-white);
 }
 
 .dashboard-card:hover {
   transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .admin-dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  width: 100%;
 }
 
 /* Blog details page */
@@ -291,11 +386,65 @@ footer .text-muted {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  width: 100%;
 }
 
 .comment-author {
   font-weight: 600;
   color: var(--primary-dark);
+}
+
+/* Auth pages */
+.auth-container {
+  max-width: 500px;
+  margin: 80px auto 0;
+  padding: 2rem;
+  background-color: var(--clean-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-title {
+  color: var(--primary-dark);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-subtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  margin-bottom: 1.5rem;
+}
+
+.auth-divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.auth-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-color);
+  z-index: 1;
+}
+
+.auth-divider span {
+  position: relative;
+  z-index: 2;
+  background-color: var(--clean-white);
+  padding: 0 1rem;
+  color: #777;
 }
 
 /* Responsive adjustments */
@@ -322,22 +471,109 @@ footer .text-muted {
 /* Fix for the CreateBlog form */
 .create-blog-container {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+  margin: 80px auto 0;
+  padding: 2rem;
+  background-color: var(--clean-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
 }
 
 /* Center content in containers */
 .container.py-5 {
   max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+  margin: 80px auto 0;
+  padding: 2rem !important;
+  width: 100%;
 }
 
-/* Auth pages */
-.auth-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+/* Blogs container */
+.blogs-container {
+  max-width: 1200px;
+  margin: 80px auto 0;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* Fix for blog details page */
+.blog-details-container {
+  max-width: 900px;
+  margin: 80px auto 0;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* Fix for profile page */
+.profile-container {
+  max-width: 1000px;
+  margin: 80px auto 0;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* Fix for admin dashboard */
+.admin-dashboard-container {
+  max-width: 1200px;
+  margin: 80px auto 0;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* Destinations carousel */
+.destinations-section {
+  padding: 5rem 0;
+  background-color: var(--off-white);
+  width: 100%;
+}
+
+.destination-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  height: 300px;
+  margin: 0 10px;
+  transition: transform 0.3s ease;
+}
+
+.destination-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.destination-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.destination-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 1.5rem;
+  color: white;
+}
+
+.destination-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.destination-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+}
+
+.carousel-indicators {
+  margin-bottom: 0;
 }
 

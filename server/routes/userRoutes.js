@@ -23,7 +23,7 @@ const isAdmin = async (req, res, next) => {
 // Create or update user profile
 router.post("/profile", clerkAuth, async (req, res) => {
   try {
-    const { email, username, bio, profileImage, socialLinks, country, languages } = req.body
+    const { email, username, bio, profileImage, socialLinks, country } = req.body
 
     // Find user by Clerk ID or create a new one
     let user = await User.findOne({ clerkId: req.auth.userId })
@@ -36,7 +36,6 @@ router.post("/profile", clerkAuth, async (req, res) => {
       user.profileImage = profileImage || user.profileImage
       user.socialLinks = socialLinks || user.socialLinks
       user.country = country || user.country
-      user.languages = languages || user.languages
     } else {
       // Create new user with default values
       user = new User({
@@ -47,7 +46,6 @@ router.post("/profile", clerkAuth, async (req, res) => {
         profileImage: profileImage || "",
         socialLinks: socialLinks || {},
         country: country || "",
-        languages: languages || [],
       })
     }
 
@@ -65,7 +63,6 @@ router.post("/profile", clerkAuth, async (req, res) => {
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
         country: user.country,
-        languages: user.languages,
         createdAt: user.createdAt,
       },
     })
@@ -90,11 +87,13 @@ router.get("/profile", clerkAuth, async (req, res) => {
         profileImage: "",
         socialLinks: {},
         country: "",
-        languages: [],
       })
 
       await user.save()
     }
+
+    // Get user's blogs
+    const blogs = await Blog.find({ author: user.clerkId }).sort({ createdAt: -1 })
 
     res.status(200).json({
       user: {
@@ -107,10 +106,16 @@ router.get("/profile", clerkAuth, async (req, res) => {
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
         country: user.country,
-        languages: user.languages,
-        following: user.following,
-        followers: user.followers,
+        following: user.following || [],
+        followers: user.followers || [],
         createdAt: user.createdAt,
+        blogs: blogs.map((blog) => ({
+          _id: blog._id,
+          title: blog.title,
+          createdAt: blog.createdAt,
+          likesCount: blog.likes ? blog.likes.length : 0,
+          commentsCount: blog.comments ? blog.comments.length : 0,
+        })),
       },
     })
   } catch (error) {
@@ -122,14 +127,40 @@ router.get("/profile", clerkAuth, async (req, res) => {
 // Get public profile by Clerk ID
 router.get("/profile/:clerkId", async (req, res) => {
   try {
+    // First check if the user exists
     const user = await User.findOne({ clerkId: req.params.clerkId })
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" })
+      // If user doesn't exist in our database yet, create a minimal profile
+      const newUser = new User({
+        clerkId: req.params.clerkId,
+        email: "unknown@example.com", // Placeholder
+        username: "New Traveler",
+        bio: "",
+        profileImage: "",
+        socialLinks: {},
+        country: "",
+      })
+
+      await newUser.save()
+
+      // Return the minimal profile
+      return res.status(200).json({
+        user: {
+          username: newUser.username,
+          bio: newUser.bio,
+          profileImage: newUser.profileImage,
+          socialLinks: newUser.socialLinks,
+          country: newUser.country,
+          followersCount: 0,
+          followingCount: 0,
+        },
+        blogs: [],
+      })
     }
 
     // Get user's blogs
-    const blogs = await Blog.find({ author: user.clerkId }).sort({ createdAt: -1 }).limit(10)
+    const blogs = await Blog.find({ author: user.clerkId }).sort({ createdAt: -1 })
 
     res.status(200).json({
       user: {
@@ -138,16 +169,15 @@ router.get("/profile/:clerkId", async (req, res) => {
         profileImage: user.profileImage,
         socialLinks: user.socialLinks,
         country: user.country,
-        languages: user.languages,
-        followersCount: user.followers.length,
-        followingCount: user.following.length,
+        followersCount: user.followers ? user.followers.length : 0,
+        followingCount: user.following ? user.following.length : 0,
       },
       blogs: blogs.map((blog) => ({
         _id: blog._id,
         title: blog.title,
         createdAt: blog.createdAt,
-        likesCount: blog.likes.length,
-        commentsCount: blog.comments.length,
+        likesCount: blog.likes ? blog.likes.length : 0,
+        commentsCount: blog.comments ? blog.comments.length : 0,
       })),
     })
   } catch (error) {
@@ -181,6 +211,10 @@ router.post("/follow/:clerkId", clerkAuth, async (req, res) => {
         username: req.body.username || req.auth.tokenPayload?.name || "user",
       })
     }
+
+    // Initialize arrays if they don't exist
+    if (!currentUser.following) currentUser.following = []
+    if (!userToFollow.followers) userToFollow.followers = []
 
     // Check if already following
     if (currentUser.following.includes(req.params.clerkId)) {
@@ -219,6 +253,10 @@ router.post("/unfollow/:clerkId", clerkAuth, async (req, res) => {
     if (!currentUser) {
       return res.status(404).json({ error: "User not found" })
     }
+
+    // Initialize arrays if they don't exist
+    if (!currentUser.following) currentUser.following = []
+    if (!userToUnfollow.followers) userToUnfollow.followers = []
 
     // Check if following
     if (!currentUser.following.includes(req.params.clerkId)) {

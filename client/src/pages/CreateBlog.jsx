@@ -1,9 +1,8 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button, Form, Spinner, Container, Alert, Card } from "react-bootstrap"
+import { Button, Form, Spinner, Alert, Card } from "react-bootstrap"
 import { useAuth } from "@clerk/clerk-react"
+import { API_ENDPOINTS } from "../config/api"
 
 export default function CreateBlog() {
   const { getToken } = useAuth()
@@ -28,7 +27,7 @@ export default function CreateBlog() {
       formData.append("content", content)
       if (image) formData.append("image", image)
 
-      const response = await fetch("http://localhost:5000/api/blogs", {
+      const response = await fetch(API_ENDPOINTS.blogs, {
         method: "POST",
         body: formData,
         headers: {
@@ -53,7 +52,7 @@ export default function CreateBlog() {
   }
 
   return (
-    <Container className="py-5">
+    <div className="create-blog-container">
       <Card className="shadow-sm border-0">
         <Card.Body className="p-4">
           <h2 className="text-center mb-4">Write a Blog</h2>
@@ -99,7 +98,7 @@ export default function CreateBlog() {
           </Form>
         </Card.Body>
       </Card>
-    </Container>
+    </div>
   )
 }
 
