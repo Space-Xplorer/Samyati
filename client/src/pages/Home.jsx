@@ -1,5 +1,3 @@
-"use client"
-
 import { useNavigate } from "react-router-dom"
 import { Container, Row, Col, Button, Card } from "react-bootstrap"
 import { SignedIn, SignedOut } from "@clerk/clerk-react"
@@ -10,7 +8,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="hero-section">
+      <div className="hero-section w-100">
         <div className="hero-content">
           <h1 className="hero-title">Discover Travel Stories</h1>
           <p className="hero-subtitle">Share your adventures and connect with fellow travelers around the world</p>

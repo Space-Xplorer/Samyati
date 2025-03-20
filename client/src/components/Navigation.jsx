@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { Container, Navbar, Nav, Button } from "react-bootstrap"
@@ -32,8 +30,8 @@ export default function Navigation() {
   }, [isSignedIn, userId])
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="fixed-top">
-      <Container>
+    <Navbar bg="dark" variant="dark" expand="lg" className="fixed-top w-100">
+      <Container fluid>
         <Navbar.Brand as={Link} to="/">
           Samyati
         </Navbar.Brand>

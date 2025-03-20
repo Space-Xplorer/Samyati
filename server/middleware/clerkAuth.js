@@ -10,10 +10,7 @@ const clerkAuth = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1]
 
-    // For development purposes, we'll just extract the user ID from the token
-    // In production, you should properly verify the token with Clerk's SDK
     try {
-      // Basic JWT decode to get the user ID
       const decoded = jwt.decode(token)
 
       if (!decoded || !decoded.sub) {

@@ -1,6 +1,3 @@
-"use client"
-
-// App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { useAuth } from "@clerk/clerk-react"
 import { Container, Spinner } from "react-bootstrap"

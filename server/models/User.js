@@ -45,12 +45,12 @@ const UserSchema = new mongoose.Schema(
     ],
     following: [
       {
-        type: String, // Clerk IDs of users being followed
+        type: String,
       },
     ],
     followers: [
       {
-        type: String, // Clerk IDs of followers
+        type: String, 
       },
     ],
   },

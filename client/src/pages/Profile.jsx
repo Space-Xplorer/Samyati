@@ -16,7 +16,6 @@ export default function Profile() {
   const [error, setError] = useState(null)
   const [userBlogs, setUserBlogs] = useState([])
 
-  // Form state
   const [formData, setFormData] = useState({
     username: "",
     bio: "",
@@ -178,7 +177,7 @@ export default function Profile() {
 
       setIsFollowing(!isFollowing)
 
-      // Update follower count
+      // Update follower count (work in progress)
       if (isFollowing) {
         setProfile((prev) => ({
           ...prev,
@@ -472,7 +471,7 @@ export default function Profile() {
             </Row>
           ) : (
             <Alert variant="info">
-              {isOwnProfile ? "You haven't written any blogs yet." : "This user hasn't written any blogs yet."}
+              {isOwnProfile ? "You haven't written any blogs yet." : "This user did not write any blogs yet."}
               {isOwnProfile && (
                 <div className="mt-3">
                   <Button as={Link} to="/create-blog" variant="success">

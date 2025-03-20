@@ -20,7 +20,6 @@ const isAdmin = async (req, res, next) => {
   }
 }
 
-// All admin routes require authentication and admin role
 router.use(clerkAuth, isAdmin)
 
 // Get dashboard stats
@@ -97,7 +96,7 @@ router.delete("/blogs/:blogId", async (req, res) => {
   }
 })
 
-// Feature a blog (add a featured flag to the Blog model)
+// Feature a blog
 router.put("/blogs/:blogId/feature", async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.blogId)
